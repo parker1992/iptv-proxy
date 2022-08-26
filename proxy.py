@@ -24,7 +24,7 @@ def reload():
 
         m3u_parser.parse_m3u(
             get_variable(config, 'M3U_LOCATION'),
-            get_variable(config, 'LISTEN_HOST'),
+            get_variable(config, 'M3U_HOST'),
             int(get_variable(config, 'M3U_PORT') or 0),
             os.path.join(app.static_folder, 'iptv.m3u')
         )
@@ -57,7 +57,7 @@ if __name__ != '__main__':
 
     reload_timer(
         get_variable(config, 'M3U_LOCATION'),
-        get_variable(config, 'LISTEN_HOST'),
+        get_variable(config, 'M3U_HOST'),
         int(get_variable(config, 'M3U_PORT') or 0),
         int(get_variable(config, 'RELOAD_INTERVAL_MIN')),
         os.path.join(app.static_folder, 'iptv.m3u')
@@ -66,7 +66,7 @@ if __name__ != '__main__':
 if __name__ == '__main__':
     config.read(os.path.join(app.root_path, 'config.ini'))
 
-    host = get_variable(config, 'LISTEN_HOST')
+    host = get_variable(config, 'M3U_HOST')
     
     reload_timer(
         get_variable(config, 'M3U_LOCATION'),
@@ -76,4 +76,4 @@ if __name__ == '__main__':
         os.path.join(app.static_folder, 'iptv.m3u')
     )
 
-    app.run(host=host, port=int(get_variable(config, 'LISTEN_PORT')))
+    app.run(host='0.0.0.0', port=int(get_variable(config, 'LISTEN_PORT')))
