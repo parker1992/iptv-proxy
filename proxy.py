@@ -15,7 +15,14 @@ m3u_parser = parser.Parser()
 
 @app.route('/proxy/<path:path>')
 def proxy(path):
-    return get(path).content
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36',
+        'Accept': '/',
+        'Connection': 'Keep-Alive'
+    }
+    response = get(path, headers=headers, stream=True, timeout=5, allow_redirects=True)
+
+    return response.raw
 
 @app.route('/proxy/reload', methods=['GET'])
 def reload():
