@@ -1,5 +1,3 @@
-# TODO: Clean this entire thing up. There's a lot of duplicate code here.
-
 import os
 import logging
 import parser
@@ -11,6 +9,7 @@ from requests import get
 
 app = Flask(__name__)
 config = ConfigParser(allow_no_value=True)
+config.read(os.path.join(app.root_path, 'config.ini'))
 m3u_parser = parser.Parser()
 
 @app.route('/proxy/<path:path>')
@@ -20,7 +19,7 @@ def proxy(path):
         'Accept': '/',
         'Connection': 'Keep-Alive'
     }
-    response = get(path, headers=headers, stream=True, timeout=5, allow_redirects=True)
+    response = get(path, headers=headers, stream=True, allow_redirects=True)
 
     return response.raw
 
@@ -28,29 +27,30 @@ def proxy(path):
 def reload():
     try:
         app.logger.info('BEGIN: Force-reloading m3u file')
-
-        m3u_parser.parse_m3u(
-            get_variable(config, 'M3U_LOCATION'),
-            get_variable(config, 'M3U_HOST'),
-            int(get_variable(config, 'M3U_PORT') or 0),
-            os.path.join(app.static_folder, 'iptv.m3u')
-        )
-
+        reload(config)
         app.logger.info('END: Force-reloaded m3u file')
         return Response(status=HTTPStatus.OK)
     except Exception as err:
         app.logger.exception('END: Error force-reloading m3u file', err)
         return Response(status=HTTPStatus.INTERNAL_SERVER_ERROR)
 
-def reload_timer(m3u_location: str, host: str, port: int, reload_interval: int, output_path: str):
+def reload_timer():
     try:
         app.logger.info('BEGIN: Reloading m3u file')
-        m3u_parser.parse_m3u(m3u_location, host, port, output_path)
+        reload(config)
         app.logger.info('END: Reloaded m3u file')
     except Exception as err:
         app.logger.exception('END: Error reloading m3u file', err)
 
-    Timer(60 * reload_interval, lambda: reload_timer(m3u_location, host, port, reload_interval, output_path)).start()
+    Timer(60 * int(get_variable(config, 'RELOAD_INTERVAL_MIN')), lambda: reload_timer(config)).start()
+
+def reload(config: ConfigParser):
+    m3u_parser.parse_m3u(
+        get_variable(config, 'M3U_LOCATION'),
+        get_variable(config, 'M3U_HOST'),
+        int(get_variable(config, 'M3U_PORT') or 0),
+        os.path.join(app.static_folder, 'iptv.m3u')
+    )
 
 def get_variable(config: ConfigParser, var: str):
     return os.getenv(var, config.get('APP', var))
@@ -60,27 +60,11 @@ if __name__ != '__main__':
     app.logger.handlers = gunicorn_logger.handlers
     app.logger.setLevel(gunicorn_logger.level)
 
-    config.read(os.path.join(app.root_path, 'config.ini'))
-
-    reload_timer(
-        get_variable(config, 'M3U_LOCATION'),
-        get_variable(config, 'M3U_HOST'),
-        int(get_variable(config, 'M3U_PORT') or 0),
-        int(get_variable(config, 'RELOAD_INTERVAL_MIN')),
-        os.path.join(app.static_folder, 'iptv.m3u')
-    )
+    reload_timer()
 
 if __name__ == '__main__':
-    config.read(os.path.join(app.root_path, 'config.ini'))
-
     host = get_variable(config, 'M3U_HOST')
     
-    reload_timer(
-        get_variable(config, 'M3U_LOCATION'),
-        host,
-        int(get_variable(config, 'M3U_PORT') or 0),
-        int(get_variable(config, 'RELOAD_INTERVAL_MIN')),
-        os.path.join(app.static_folder, 'iptv.m3u')
-    )
+    reload_timer()
 
     app.run(host='0.0.0.0', port=int(get_variable(config, 'LISTEN_PORT')))
