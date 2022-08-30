@@ -38,7 +38,7 @@ def data(path):
     except Exception as err:
         app.logger.exception('END: Error fetching {path}', err)
 
-    return Response(response=response.content, content_type=response.headers['Content-Type'], status=HTTPStatus.OK)
+    return Response(response=response.content, headers=response.headers, status=HTTPStatus.OK)
 
 @app.route('/proxy/reload', methods=['GET'])
 def reload():
