@@ -23,9 +23,13 @@ class Parser:
             content = response.text
         else:
             with open(m3u_location, 'r') as input:
+                os.makedirs(os.path.dirname(output_path), exist_ok=True)
                 content = input.read()
 
         with open(output_path, 'w') as output:
-            os.makedirs(os.path.dirname(output_path), exist_ok=True)
             port_str = f':{str(port)}' if port != 0 else ''
-            output.write(re.sub('http', f'http://{host}{port_str}/proxy/http', content, flags=re.M))
+            
+            content = re.sub(r'(EXTM3U.*url-tvg=")(http)', rf'\1http://{host}{port_str}/proxy/data/\2', content, flags=re.M)
+            content = re.sub(r'(EXTINF.*tvg-logo=")(http)', rf'\1http://{host}{port_str}/proxy/data/\2', content, flags=re.M)
+            content = re.sub(r'^(http)', rf'http://{host}{port_str}/proxy/stream/\1', content, flags=re.M)
+            output.write(content)

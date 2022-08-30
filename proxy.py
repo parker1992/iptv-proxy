@@ -12,8 +12,8 @@ config = ConfigParser(allow_no_value=True)
 config.read(os.path.join(app.root_path, 'config.ini'))
 m3u_parser = parser.Parser()
 
-@app.route('/proxy/<path:path>')
-def proxy(path):
+@app.route('/proxy/stream/<path:path>')
+def stream(path):
     headers = {
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36',
         'Accept': '/',
@@ -22,6 +22,23 @@ def proxy(path):
     response = get(path, headers=headers, stream=True, allow_redirects=True)
 
     return response.raw
+
+@app.route('/proxy/data/<path:path>')
+def data(path):
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36',
+        'Accept': '/'
+    }
+
+    app.logger.info(f'BEGIN: Fetching {path}')
+
+    try:
+        response = get(path, headers=headers)
+        app.logger.info(f'END: Fetched {path}')
+    except Exception as err:
+        app.logger.exception('END: Error fetching {path}', err)
+
+    return Response(response=response.content, content_type=response.headers['Content-Type'], status=HTTPStatus.OK)
 
 @app.route('/proxy/reload', methods=['GET'])
 def reload():
