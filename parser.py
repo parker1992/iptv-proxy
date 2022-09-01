@@ -10,6 +10,12 @@ class Parser:
         return url_parsed.scheme in ('http', 'https')
 
     def parse_m3u(self, m3u_location: str, host: str, port: int, output_path: str):
+        """
+        Get the m3u from either a file location or through a web request.
+        After the m3u is retrieved, this will prefix all the URLs to go through the /proxy/stream endpoint.
+        The m3u file will be saved as /static/iptv.m3u so your IPTV player can access it.
+        """
+
         content = str()
 
         if self.is_url(m3u_location):
@@ -29,6 +35,8 @@ class Parser:
         with open(output_path, 'w') as output:
             port_str = f':{str(port)}' if port != 0 else ''
             
+            # Prefix all URLs in the m3u file with the proxy endpoints.
+            # Logos and EPG data should go to /proxy/data and the streams should go to /proxy/stream.
             content = re.sub(r'(EXTM3U.*url-tvg=")(http)', rf'\1http://{host}{port_str}/proxy/data/\2', content, flags=re.M)
             content = re.sub(r'(EXTINF.*tvg-logo=")(http)', rf'\1http://{host}{port_str}/proxy/data/\2', content, flags=re.M)
             content = re.sub(r'^(http)', rf'http://{host}{port_str}/proxy/stream/\1', content, flags=re.M)

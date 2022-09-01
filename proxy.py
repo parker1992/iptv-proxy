@@ -14,6 +14,13 @@ m3u_parser = parser.Parser()
 
 @app.route('/proxy/stream/<path:path>')
 def stream(path):
+    """
+    Returns a stream of data from the proxied stream.
+
+    For example a call to, http://0.0.0.0:8080/proxy/stream/http://iptv-provider.com/stream/token
+    will make a proxied call to http://iptv-provider.com/stream/token.
+    """
+
     headers = {
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36',
         'Accept': '/',
@@ -28,6 +35,11 @@ def stream(path):
 
 @app.route('/proxy/data/<path:path>')
 def data(path):
+    """
+    Used for fetching logo and EPG data through the proxy.
+    Unlike stream(), this does not return a streamed response.
+    """
+
     headers = {
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36',
         'Accept': '/'
@@ -45,6 +57,11 @@ def data(path):
 
 @app.route('/proxy/reload', methods=['GET'])
 def reload():
+    """
+    By default, the m3u file will be reloaded every 60 minutes.
+    This is used to reload the m3u on an ad-hoc basis.
+    """
+
     try:
         app.logger.info('BEGIN: Force-reloading m3u file')
         reload(config)
@@ -55,6 +72,10 @@ def reload():
         return Response(status=HTTPStatus.INTERNAL_SERVER_ERROR)
 
 def reload_timer():
+    """
+    This will reload the m3u and then subsequently reload it every [by default] 60 minutes afterwards.
+    """
+
     try:
         app.logger.info('BEGIN: Reloading m3u file')
         reload(config)
@@ -73,6 +94,10 @@ def reload(config: ConfigParser):
     )
 
 def get_variable(config: ConfigParser, var: str):
+    """
+    This gets the configs first from environment variables,
+    and if it's not set, it will check the config.ini file.
+    """
     return os.getenv(var, config.get('APP', var))
 
 if __name__ != '__main__':
