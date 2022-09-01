@@ -19,9 +19,12 @@ def stream(path):
         'Accept': '/',
         'Connection': 'Keep-Alive'
     }
-    response = get(path, headers=headers, stream=True, allow_redirects=True)
+    stream = get(path, headers=headers, stream=True, allow_redirects=True)
 
-    return response.raw
+    response = Response(stream.raw, content_type=stream.headers['Content-Type'])
+    response.call_on_close(lambda: stream.close())
+
+    return response
 
 @app.route('/proxy/data/<path:path>')
 def data(path):
