@@ -1,3 +1,4 @@
+import json
 import os
 import logging
 import parser
@@ -53,7 +54,12 @@ def data(path):
     except Exception as err:
         app.logger.exception('END: Error fetching {path}', err)
 
-    return Response(response=response.content, headers=response.headers, status=HTTPStatus.OK)
+    return_headers = {
+        'Content-Type': response.headers['Content-Type'],
+        'Content-Disposition': response.headers['Content-Disposition']
+    }
+
+    return Response(response=response.content, headers=return_headers, status=HTTPStatus.OK)
 
 @app.route('/proxy/reload', methods=['GET'])
 def reload():
