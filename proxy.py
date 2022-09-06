@@ -7,6 +7,7 @@ from configparser import ConfigParser
 from threading import Timer
 from flask import Flask, Response
 from requests import get
+from urllib.parse import urlparse
 
 app = Flask(__name__)
 config = ConfigParser(allow_no_value=True)
@@ -56,7 +57,7 @@ def data(path):
 
     return_headers = {
         'Content-Type': response.headers['Content-Type'],
-        'Content-Disposition': response.headers['Content-Disposition']
+        'Content-Disposition': f'attachment; filename="{os.path.basename(urlparse(path).path)}"'
     }
 
     return Response(response=response.content, headers=return_headers, status=HTTPStatus.OK)
