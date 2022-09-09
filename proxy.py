@@ -62,6 +62,15 @@ def data(path):
 
     return Response(response=response.content, headers=return_headers, status=HTTPStatus.OK)
 
+@app.route('/proxy/xmltv')
+def xmltv():
+    """
+    Used for fetching XMLTV (EPG) data through the proxy.
+    Unlike stream(), this does not return a streamed response.
+    """
+    url = get_variable(config, 'XMLTV_LOCATION') 
+    return data(url) if url else ''
+
 @app.route('/proxy/reload', methods=['GET'])
 def reload():
     """
