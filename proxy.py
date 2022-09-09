@@ -2,6 +2,7 @@ import json
 import os
 import logging
 import parser
+import xmltv
 from http import HTTPStatus
 from configparser import ConfigParser
 from threading import Timer
@@ -13,6 +14,7 @@ app = Flask(__name__)
 config = ConfigParser(allow_no_value=True)
 config.read(os.path.join(app.root_path, 'config.ini'))
 m3u_parser = parser.Parser()
+xmltv = xmltv.Xmltv()
 
 @app.route('/proxy/stream/<path:path>')
 def stream(path):
@@ -62,15 +64,6 @@ def data(path):
 
     return Response(response=response.content, headers=return_headers, status=HTTPStatus.OK)
 
-@app.route('/proxy/xmltv')
-def xmltv():
-    """
-    Used for fetching XMLTV (EPG) data through the proxy.
-    Unlike stream(), this does not return a streamed response.
-    """
-    url = get_variable(config, 'XMLTV_LOCATION') 
-    return data(url) if url else ''
-
 @app.route('/proxy/reload', methods=['GET'])
 def reload():
     """
@@ -108,6 +101,14 @@ def reload(config: ConfigParser):
         int(get_variable(config, 'M3U_PORT') or 0),
         bool(get_variable(config, 'USE_HTTPS') or False),
         os.path.join(app.static_folder, 'iptv.m3u')
+    )
+
+    xmltv.fetch_xmltv(
+        str(get_variable(config, 'XMLTV_LOCATION')) or '',
+        get_variable(config, 'M3U_HOST'),
+        int(get_variable(config, 'M3U_PORT') or 0),
+        bool(get_variable(config, 'USE_HTTPS') or False),        
+        os.path.join(app.static_folder, 'epg.xml')
     )
 
 def get_variable(config: ConfigParser, var: str):
