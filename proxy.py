@@ -97,6 +97,7 @@ def reload(config: ConfigParser):
         get_variable(config, 'M3U_LOCATION'),
         get_variable(config, 'M3U_HOST'),
         int(get_variable(config, 'M3U_PORT') or 0),
+        bool(get_variable(config, 'USE_HTTPS') or False),
         os.path.join(app.static_folder, 'iptv.m3u')
     )
 
