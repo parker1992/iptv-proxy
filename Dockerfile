@@ -1,4 +1,4 @@
-FROM python:latest
+FROM python:3.10.6-slim-buster
 
 WORKDIR /usr/src/proxy
 COPY requirements.txt .
