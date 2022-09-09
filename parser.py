@@ -41,5 +41,5 @@ class Parser:
             content = re.sub(r'(EXTINF.*tvg-logo=")(http)', rf'\1http://{host}{port_str}/proxy/data/\2', content, flags=re.M)
             content = re.sub(r'^(http)', rf'http://{host}{port_str}/proxy/stream/\1', content, flags=re.M)
             if use_https:
-                content = re.sub(r'(http:)',rf'https:', content, flags=re.M)
+                content = re.sub(rf'(http://{host})',rf'https://{host}', content, flags=re.M)
             output.write(content)
