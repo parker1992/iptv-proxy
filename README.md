@@ -1,5 +1,5 @@
 # iptv-proxy
-Simple Flask proxy app for m3u files. This should be used alongside a VPN container. If you don't have a VPN, then there's no point of using an m3u proxy. I recommend the bubuntux/nordvpn docker image to be run alonside this.
+Simple Flask proxy app for m3u files. This should be used alongside a VPN container. If you don't have a VPN, then there's no point of using an m3u proxy. I recommend the [bubuntux/nordvpn](https://github.com/bubuntux/nordlynx) docker image to be run alongside this.
 
 When the app first loads, it will prefix all URLs in the m3u file with the proxy endpoint.
 For example, see the lines below in a sample m3u file:
@@ -24,7 +24,7 @@ http://your-local-ip-address:8080/static/iptv.m3u
 
 This will route all IPTV traffic to go accross a VPN, which can be helpful if your TV doesn't support VPN configurations.
 
-# Docker
+## Docker Compose
 
 ```
 version: '3'
@@ -59,3 +59,7 @@ services:
     depends_on:
       - nordlynx
 ```
+
+### M3U Editor
+
+To edit m3u files, I recommend [m3u4u](http://m3u4u.com). After editing the m3u file, you can point the `M3U_LOCATION` variable to the m3u4u output URL.
