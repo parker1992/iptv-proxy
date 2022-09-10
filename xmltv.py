@@ -11,6 +11,9 @@ class Xmltv:
         The xmltv file will be saved as /static/epg.xml so your IPTV player can access it.
         """
 
+        if xmltv_location == '':
+            return
+
         content = str()
         url_parser = parser.Parser()
         
