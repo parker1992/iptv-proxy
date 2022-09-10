@@ -29,11 +29,10 @@ class Xmltv:
                 content = input.read()
 
         with open(str(output_path), 'w') as output:
-
             port_str = f':{str(port)}' if port != 0 else ''
             
             # Prefix all URLs in the xml file with the proxy endpoints.
             content = re.sub(r'(http|https)', rf'http://{host}{port_str}/proxy/data/\1', content, flags=re.M)
             if use_https == True:
-                content = re.sub(rf'(http://{host})',rf'https://{host}', content, flags=re.M)        
+                content = re.sub(rf'(http://{host})', rf'https://{host}', content, flags=re.M)
             output.write(content)

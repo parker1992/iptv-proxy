@@ -1,18 +1,16 @@
-import json
 import os
 import logging
+from config import Config
 import parser
 import xmltv
 from http import HTTPStatus
-from configparser import ConfigParser
 from threading import Timer
 from flask import Flask, Response
 from requests import get
 from urllib.parse import urlparse
 
 app = Flask(__name__)
-config = ConfigParser(allow_no_value=True)
-config.read(os.path.join(app.root_path, 'config.ini'))
+config = Config(app.root_path)
 m3u_parser = parser.Parser()
 xmltv = xmltv.Xmltv()
 
@@ -92,31 +90,24 @@ def reload_timer():
     except Exception as err:
         app.logger.exception('END: Error reloading m3u file', err)
 
-    Timer(60 * int(get_variable(config, 'RELOAD_INTERVAL_MIN')), lambda: reload_timer(config)).start()
+    Timer(60 * config.RELOAD_INTERVAL_MIN, lambda: reload_timer(config)).start()
 
-def reload(config: ConfigParser):
+def reload(config: Config):
     m3u_parser.parse_m3u(
-        get_variable(config, 'M3U_LOCATION'),
-        get_variable(config, 'M3U_HOST'),
-        int(get_variable(config, 'M3U_PORT') or 0),
-        bool(get_variable(config, 'USE_HTTPS') or False),
+        config.M3U_LOCATION,
+        config.M3U_HOST,
+        config.M3U_PORT,
+        config.USE_HTTPS,
         os.path.join(app.static_folder, 'iptv.m3u')
     )
 
     xmltv.fetch_xmltv(
-        str(get_variable(config, 'XMLTV_LOCATION')) or '',
-        get_variable(config, 'M3U_HOST'),
-        int(get_variable(config, 'M3U_PORT') or 0),
-        bool(get_variable(config, 'USE_HTTPS') or False),        
+        config.XMLTV_LOCATION,
+        config.M3U_HOST,
+        config.M3U_PORT,
+        config.USE_HTTPS,
         os.path.join(app.static_folder, 'epg.xml')
     )
-
-def get_variable(config: ConfigParser, var: str):
-    """
-    This gets the configs first from environment variables,
-    and if it's not set, it will check the config.ini file.
-    """
-    return os.getenv(var, config.get('APP', var))
 
 if __name__ != '__main__':
     gunicorn_logger = logging.getLogger('gunicorn.error')
@@ -126,8 +117,8 @@ if __name__ != '__main__':
     reload_timer()
 
 if __name__ == '__main__':
-    host = get_variable(config, 'M3U_HOST')
+    host = config.M3U_HOST
     
     reload_timer()
 
-    app.run(host='0.0.0.0', port=int(get_variable(config, 'LISTEN_PORT')))
+    app.run(host='0.0.0.0', port=config.LISTEN_PORT)
