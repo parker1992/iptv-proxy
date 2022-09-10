@@ -98,6 +98,7 @@ def reload(config: Config):
         config.M3U_HOST,
         config.M3U_PORT,
         config.USE_HTTPS,
+        config.GROUPS_FILTER,
         os.path.join(app.static_folder, 'iptv.m3u')
     )
 
