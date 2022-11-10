@@ -56,6 +56,8 @@ services:
       - M3U_LOCATION= # Required. Either a path or URL.
       - RELOAD_INTERVAL_MIN=60 # Not required and defaults to 60. This is used to update the /static directory with the latest m3u file.
       - LISTEN_PORT=8080
+      - M3U_PORT=8080 # The port to add to the m3u file. If the app is running on port 80, you may not need this.
+
     depends_on:
       - nordlynx
 ```
