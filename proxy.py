@@ -28,7 +28,7 @@ def stream(path):
         'Accept': '/',
         'Connection': 'Keep-Alive'
     }
-    stream = get(path, headers=headers, stream=True, allow_redirects=True)
+    stream = get(path, headers=headers, stream=True, allow_redirects=True, timeout=3.0)
 
     response = Response(stream.raw, content_type=stream.headers['Content-Type'])
     response.call_on_close(lambda: stream.close())
