@@ -28,7 +28,6 @@ def stream(path):
         'Accept': '/',
         'Connection': 'Keep-Alive'
     }
-    stream = get(path, headers=headers, stream=True, allow_redirects=True, timeout=3.0)
 
     try:
         app.logger.info(f'STREAMING: {path}')
