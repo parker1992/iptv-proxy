@@ -50,7 +50,7 @@ def data(path):
     app.logger.info(f'BEGIN: Fetching {path}')
 
     try:
-        response = get(path, headers=headers)
+        response = get(path, headers=headers, timeout=3.0)
         app.logger.info(f'END: Fetched {path}')
     except Exception as err:
         app.logger.exception('END: Error fetching {path}', err)
