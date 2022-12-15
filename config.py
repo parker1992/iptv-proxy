@@ -36,3 +36,7 @@ class Config:
     @property
     def RELOAD_INTERVAL_MIN(self):
         return int(os.getenv('RELOAD_INTERVAL_MIN', self._config.get('APP', 'RELOAD_INTERVAL_MIN')))
+
+    @property
+    def GROUPS_FILTER(self):
+        return os.getenv('GROUPS_FILTER', self._config.get('APP', 'GROUPS_FILTER')) or ''
