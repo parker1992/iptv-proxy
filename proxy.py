@@ -30,6 +30,14 @@ def stream(path):
     }
     stream = get(path, headers=headers, stream=True, allow_redirects=True, timeout=3.0)
 
+    try:
+        app.logger.info(f'STREAMING: {path}')
+        stream = get(path, headers=headers, stream=True, allow_redirects=True, timeout=3.0)
+        app.logger.info(f'STREAMING END: {path}')
+    except Exception as err:
+        app.logger.exception('STREAMING: Error streaming {path}', err)
+        return Response(response='', headers='', status=HTTPStatus.NOT_FOUND)    
+
     response = Response(stream.raw, content_type=stream.headers['Content-Type'])
     response.call_on_close(lambda: stream.close())
 
@@ -54,6 +62,7 @@ def data(path):
         app.logger.info(f'END: Fetched {path}')
     except Exception as err:
         app.logger.exception('END: Error fetching {path}', err)
+        return Response(response='', headers='', status=HTTPStatus.NOT_FOUND)
 
     return_headers = {
         'Content-Type': response.headers['Content-Type'],
