@@ -28,7 +28,14 @@ def stream(path):
         'Accept': '/',
         'Connection': 'Keep-Alive'
     }
-    stream = get(path, headers=headers, stream=True, allow_redirects=True)
+
+    try:
+        app.logger.info(f'STREAMING: {path}')
+        stream = get(path, headers=headers, stream=True, allow_redirects=True, timeout=3.0)
+        app.logger.info(f'STREAMING END: {path}')
+    except Exception as err:
+        app.logger.exception('STREAMING: Error streaming {path}', err)
+        return Response(response='', headers='', status=HTTPStatus.NOT_FOUND)    
 
     response = Response(stream.raw, content_type=stream.headers['Content-Type'])
     response.call_on_close(lambda: stream.close())
@@ -50,10 +57,11 @@ def data(path):
     app.logger.info(f'BEGIN: Fetching {path}')
 
     try:
-        response = get(path, headers=headers)
+        response = get(path, headers=headers, timeout=3.0)
         app.logger.info(f'END: Fetched {path}')
     except Exception as err:
         app.logger.exception('END: Error fetching {path}', err)
+        return Response(response='', headers='', status=HTTPStatus.NOT_FOUND)
 
     return_headers = {
         'Content-Type': response.headers['Content-Type'],
@@ -90,7 +98,7 @@ def reload_timer():
     except Exception as err:
         app.logger.exception('END: Error reloading m3u file', err)
 
-    Timer(60 * config.RELOAD_INTERVAL_MIN, lambda: reload_timer(config)).start()
+    Timer(60 * config.RELOAD_INTERVAL_MIN, lambda: reload_timer()).start()
 
 def reload(config: Config):
     m3u_parser.parse_m3u(
@@ -98,6 +106,7 @@ def reload(config: Config):
         config.M3U_HOST,
         config.M3U_PORT,
         config.USE_HTTPS,
+        config.GROUPS_FILTER,
         os.path.join(app.static_folder, 'iptv.m3u')
     )
 

@@ -62,6 +62,18 @@ services:
       - nordlynx
 ```
 
+### Configuration / Environment variables
+| Name | Use | Example |
+|--|--|--|
+| M3U_LOCATION | File path or URL to the M3U | https://tv.myprovider.com:80/get.php?username=myUsername&password=myPassword&type=mpegts&output=m3u_plus |
+| XMLTV_LOCATION | Optional file path or URL to an XMLTV file | https://tv.myprovider.com:80/xmltv.php?username=myUsername&password=myPassword |
+| M3U_PORT | The port that will be written to your proxified M3U + XMLTV | 443 |
+| M3U_HOST | The hostname that will be written to your proxified M3U + XMLTV | iptv-proxy.mydomain.lan |
+| LISTEN_PORT | The port the process will really listen on | 8080 |
+| USE_HTTPS | Will use https as URI scheme for references to the proxy | True |
+| RELOAD_INTERVAL_MIN | The interval in minutes in which the M3u + XMLTV gets re-fetched | 60 |
+| GROUPS_FILTER | Optional comma-separated list of group-id's to filter out ('group-title="<groupname>"' in the '#EXTINF:' line) | \|MULTI\| NETFLIX,DE\| ALLGEMEIN,to check
+
 ### M3U Editor
 
 To edit m3u files, I recommend [m3u4u](http://m3u4u.com). After editing the m3u file, you can point the `M3U_LOCATION` variable to the m3u4u output URL.

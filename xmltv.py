@@ -19,7 +19,7 @@ class Xmltv:
         
         if url_parser.is_url(xmltv_location):
             headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'}
-            response = requests.get(xmltv_location, headers=headers)
+            response = requests.get(xmltv_location, headers=headers, timeout=3.0)
 
             if response.status_code != HTTPStatus.OK:
                 raise Exception(response.text)
@@ -31,7 +31,7 @@ class Xmltv:
                 os.makedirs(os.path.dirname(output_path), exist_ok=True)
                 content = input.read()
 
-        with open(str(output_path), 'w') as output:
+        with open(output_path, 'w') as output:
             port_str = f':{str(port)}' if port != 0 else ''
             
             # Prefix all URLs in the xml file with the proxy endpoints.
