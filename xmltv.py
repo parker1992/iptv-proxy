@@ -31,7 +31,7 @@ class Xmltv:
                 os.makedirs(os.path.dirname(output_path), exist_ok=True)
                 content = input.read()
 
-        with open(str(output_path), 'w') as output:
+        with open(output_path, 'w') as output:
             port_str = f':{str(port)}' if port != 0 else ''
             
             # Prefix all URLs in the xml file with the proxy endpoints.

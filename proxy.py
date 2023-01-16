@@ -98,7 +98,7 @@ def reload_timer():
     except Exception as err:
         app.logger.exception('END: Error reloading m3u file', err)
 
-    Timer(60 * config.RELOAD_INTERVAL_MIN, lambda: reload_timer(config)).start()
+    Timer(60 * config.RELOAD_INTERVAL_MIN, lambda: reload_timer()).start()
 
 def reload(config: Config):
     m3u_parser.parse_m3u(
